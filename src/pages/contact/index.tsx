@@ -16,7 +16,7 @@ export const ContactPage = () => {
 
   const contents = useMemo(() => {
     if (!isAuthenticated) {
-      return <LoggedOut roleNameRequired="Member" />;
+      return <LoggedOut roleNameRequired={RoleNameMember} />;
     }
 
     if (
