@@ -9,10 +9,20 @@ import { RoleNameMember } from '../../constants';
 import { AppContext } from '../../context';
 import TopBar from '../../features/top-bar';
 import contactGradient from '../../common/gradients/contact-gradient.png';
+import { classNames } from '../../util/classnames';
 
 export const ContactPage = () => {
   const { isAuthenticated } = useSlashAuth();
   const { roles } = useContext(AppContext);
+
+  const hasRole = useMemo(
+    () =>
+      isAuthenticated &&
+      roles.data &&
+      roles.data[RoleNameMember] &&
+      roles.data[RoleNameMember].data,
+    [isAuthenticated, roles.data]
+  );
 
   const contents = useMemo(() => {
     if (!isAuthenticated) {
@@ -56,7 +66,10 @@ export const ContactPage = () => {
       <div className="relative w-full h-[300px] bg-green">
         <img
           src={contactGradient}
-          className="absolute inset-0 h-[300px] w-full object-cover z-0"
+          className={classNames(
+            'absolute inset-0 h-[300px] w-full object-cover z-0',
+            !hasRole && 'grayscale'
+          )}
           alt="Home Gradient"
         />
         <div className="absolute inset-0 flex flex-col">

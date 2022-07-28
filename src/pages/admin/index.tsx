@@ -50,6 +50,15 @@ export const AdminPage = () => {
     );
   }, [events, modalContext]);
 
+  const hasRole = useMemo(
+    () =>
+      isAuthenticated &&
+      roles.data &&
+      roles.data[RoleNameAdmin] &&
+      roles.data[RoleNameAdmin].data,
+    [isAuthenticated, roles.data]
+  );
+
   const eventsContent = useMemo(() => {
     if (!events.data || events.data.length === 0) {
       return (
@@ -179,7 +188,10 @@ export const AdminPage = () => {
       <div className="relative w-full h-[300px] bg-green">
         <img
           src={adminGradient}
-          className="absolute inset-0 h-[300px] w-full object-cover z-0"
+          className={classNames(
+            'absolute inset-0 h-[300px] w-full object-cover z-0',
+            !hasRole && 'grayscale'
+          )}
           alt="Home Gradient"
         />
         <div className="absolute inset-0 flex flex-col">

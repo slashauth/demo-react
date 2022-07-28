@@ -10,11 +10,46 @@ import TopBar from '../../features/top-bar';
 import { RoleNameMember } from '../../constants';
 import { NotAuthorized } from '../../common/components/NotAuthorized';
 import eventsGradient from '../../common/gradients/events-gradient.png';
+import { classNames } from '../../util/classnames';
+import { SlashauthEvent } from '../../model/event';
 
 export const EventsPage = () => {
   const { events, roles } = useContext(AppContext);
 
   const { isAuthenticated } = useSlashAuth();
+
+  const defaultEvents = useMemo(() => {
+    const now = new Date().getDate();
+    return [
+      new SlashauthEvent(
+        'Zoom townhall sync',
+        'Our weekly touchpoint for a townhall',
+        'https://www.zoom.us/example',
+        new Date(new Date().setDate(now + 5)).toLocaleDateString()
+      ),
+      new SlashauthEvent(
+        'Weekly budget committee chat',
+        'Our treasury team sync',
+        'https://www.zoom.us/example',
+        new Date(new Date().setDate(now + 6)).toLocaleDateString()
+      ),
+      new SlashauthEvent(
+        'Governance Committee',
+        'Our governance committee touchpoint',
+        'https://www.zoom.us/example',
+        new Date(new Date().setDate(now + 7)).toLocaleDateString()
+      ),
+    ];
+  }, []);
+
+  const hasRole = useMemo(
+    () =>
+      isAuthenticated &&
+      roles.data &&
+      roles.data[RoleNameMember] &&
+      roles.data[RoleNameMember].data,
+    [isAuthenticated, roles.data]
+  );
 
   const eventsContent = useMemo(() => {
     if (!isAuthenticated) {
@@ -33,7 +68,15 @@ export const EventsPage = () => {
       return <NotAuthorized roleNameRequired={RoleNameMember} />;
     }
 
-    if (!events.data || events.data.length === 0) {
+    const eventsToUse = [...defaultEvents];
+    if (events.data) {
+      eventsToUse.push(...events.data);
+      eventsToUse.sort((a, b) => {
+        return a.dateTime - b.dateTime;
+      });
+    }
+
+    if (eventsToUse.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center p-8 border border-gray-100 rounded-lg">
           <div className="flex flex-col p-5 rounded-full bg-indigo-50">
@@ -50,12 +93,12 @@ export const EventsPage = () => {
     }
     return (
       <div className="flex flex-col space-y-4">
-        {events.data.map((ev, idx) => (
+        {eventsToUse.map((ev, idx) => (
           <EventElem key={`${ev.name}-${idx}`} event={ev} idx={idx} />
         ))}
       </div>
     );
-  }, [events.data, isAuthenticated, roles.data]);
+  }, [defaultEvents, events.data, isAuthenticated, roles.data]);
 
   return (
     <>
@@ -63,7 +106,10 @@ export const EventsPage = () => {
       <div className="relative w-full h-[300px] bg-green">
         <img
           src={eventsGradient}
-          className="absolute inset-0 h-[300px] w-full object-cover z-0"
+          className={classNames(
+            'absolute inset-0 h-[300px] w-full object-cover z-0',
+            !hasRole && 'grayscale'
+          )}
           alt="Home Gradient"
         />
         <div className="absolute inset-0 flex flex-col">
