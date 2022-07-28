@@ -31,6 +31,15 @@ export const AccountPage = () => {
     setNicknameValue('');
   }, [isAuthenticated, me, nicknameValue]);
 
+  const hasRole = useMemo(
+    () =>
+      isAuthenticated &&
+      roles.data &&
+      roles.data[RoleNameMember] &&
+      roles.data[RoleNameMember].data,
+    [isAuthenticated, roles.data]
+  );
+
   const meContent = useMemo(() => {
     if (!isAuthenticated) {
       return <LoggedOut roleNameRequired={RoleNameMember} />;
@@ -134,7 +143,10 @@ export const AccountPage = () => {
       <div className="relative w-full h-[300px] bg-green">
         <img
           src={accountGradient}
-          className="absolute inset-0 h-[300px] w-full object-cover z-0"
+          className={classNames(
+            'absolute inset-0 h-[300px] w-full object-cover z-0',
+            !hasRole && 'grayscale'
+          )}
           alt="Home Gradient"
         />
         <div className="absolute inset-0 flex flex-col">
