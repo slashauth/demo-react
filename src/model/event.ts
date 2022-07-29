@@ -19,4 +19,14 @@ export class SlashauthEvent {
       console.error('No vaild date time');
     }
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public toJSONBlob(): Record<string, any> {
+    return {
+      name: this.name,
+      description: this.description,
+      link: this.link,
+      dateTime: new Date(this.dateTime).toISOString(),
+    };
+  }
 }

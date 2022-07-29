@@ -88,13 +88,13 @@ export class API {
     if (this._accessToken) {
       authHeader['Authorization'] = `Bearer ${this._accessToken}`;
     }
-    const response = await fetch(this._config.restDomain + '/events', {
+    const response = await fetch(this._config.restDomain + '/event', {
       headers: {
         ...this.defaultHeaders(),
         ...authHeader,
       },
-      method: 'PATCH',
-      body: JSON.stringify(event),
+      method: 'POST',
+      body: JSON.stringify(event.toJSONBlob()),
     });
 
     if (response.status > 299 || response.status < 200) {
