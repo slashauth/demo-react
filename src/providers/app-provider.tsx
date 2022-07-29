@@ -161,6 +161,24 @@ const AppProvider = ({ children }: Props) => {
     [config, getAccessTokenSilently]
   );
 
+  const addEvent = useCallback(
+    async (ev: SlashauthEvent): Promise<SlashauthEvent | null> => {
+      return getAccessTokenSilently().then((token) => {
+        const api = new API(config, token);
+        return api
+          .addEvent(ev)
+          .then((ev) => {
+            return ev;
+          })
+          .catch((err) => {
+            console.error('Error adding event', err);
+            return null;
+          });
+      });
+    },
+    [config, getAccessTokenSilently]
+  );
+
   const fetchAppMetadata =
     useCallback(async (): Promise<AppMetadata | null> => {
       setTimeout(
@@ -278,9 +296,7 @@ const AppProvider = ({ children }: Props) => {
     roles[RoleNameMember].data !== undefined &&
     lastRoleDataMember !== roles[RoleNameMember].data
   ) {
-    console.log('here');
     if (roles[RoleNameMember].data && isAuthenticated) {
-      console.log('fetching');
       fetchEvents();
       fetchMe();
     }
@@ -297,11 +313,13 @@ const AppProvider = ({ children }: Props) => {
         events: {
           ...events,
           fetch: fetchEvents,
-          addEvent: (event: SlashauthEvent) =>
+          addEvent: (event: SlashauthEvent) => {
+            addEvent(event);
             setEvents({
               ...events,
               data: [...(events.data || []), event],
-            }),
+            });
+          },
         },
         roles: {
           data: {
