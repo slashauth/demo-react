@@ -1,46 +1,51 @@
-# Getting Started with Create React App
+# Slashauth React Demo
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Getting started
 
-## Available Scripts
+Simply install the packages and start the app:
 
-In the project directory, you can run:
+```
+npm install
+npm start
+```
 
-### `npm start`
+By default, the Slashauth app used is the `Demo Fallback App` with ID `Q8XH-kI6lvFBUutG`. You should override this to your own app ID. Simply copy `.env.example` to `.env` and enter your client ID for the `REACT_APP_CLIENT_ID` field. This will run this app pointed to your Slashauth app.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Updating the backend
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+By default, this app talks to the Slashauth demo backend API at https://api.demo.slashauth.xyz. If you prefer to run your own backend, we have a getting started repo [on github](https://www.github.com/slashauth/demo-backend). Clone that repo and run it, and point your local service to talk with it by running `npm run dev`.
 
-### `npm test`
+You can deploy this service and simply update the config file with the location. Check `src/config.ts`.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Overview
 
-### `npm run build`
+This project is a demo frontend for Slashauth. It contains the ability to spin up token gated content with data stored in your Slashauth app backend.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+It contains two role levels:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- Demo_Admin
+- Demo_Member
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The following pages are gated by `Demo_Member`:
 
-### `npm run eject`
+- pages/events
+- pages/contact
+- pages/account
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+The following pages are gated by `Demo_Admin`:
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- pages/admin
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+In order to view the content in these pages, your Slashauth app must have your connected wallet assigned those roles.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Assigning Roles
 
-## Learn More
+Roles can be assigned by either granting a role directly through your [Slashauth app dashboard](https://app.slashauth.xyz) or by holding a token defined by a token gate.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+By default, the token gates refer to a Polygon ERC1155 contracts with address [0x3b7e292022c862dd39cc4f36e75c243bf44246d0](https://polygonscan.com/address/0x3b7e292022c862dd39cc4f36e75c243bf44246d0) for Demo_Admin and [0x757f46d81a8259281da43854f624a5923c03e000](https://polygonscan.com/address/0x757f46d81a8259281da43854f624a5923c03e000) for Demo_Member. The token ID associated is sha256(YOUR_CLIENT_APP_ID).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+These contracts are maintained by the Slashauth demo oracle and cannot be minted by any other wallet. You can mint gas-free by going to your app's demo page (click the `View demo site` button from your [Slashauth app dashboard](https://app.slashauth.xyz)).
+
+## Configuring this for yourself
+
+You can easily modify the token gates associated with your app to grant yourself roles with NFT contracts you control. Simply go to the `Token Gating` section within your app dashboard.
