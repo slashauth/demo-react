@@ -9,7 +9,7 @@ npm install
 npm start
 ```
 
-By default, the Slashauth app used is the `Demo Fallback App` with ID `Q8XH-kI6lvFBUutG`. You should override this to your own app ID. Simply copy `.env.example` to `.env` and enter your client ID for the `REACT_APP_CLIENT_ID` field. This will run this app pointed to your Slashauth app.
+By default, the Slashauth app used is the `Demo Fallback App` with ID `Q8XH-kI6lvFBUutG`. You should override this to your own app ID. Simply copy `.env.example` to `.env` and enter your app ID for the `REACT_APP_APP_ID` field. This will run this app pointed to your Slashauth app.
 
 ### Updating the backend
 
