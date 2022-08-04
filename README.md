@@ -49,3 +49,7 @@ These contracts are maintained by the Slashauth demo oracle and cannot be minted
 ## Configuring this for yourself
 
 You can easily modify the token gates associated with your app to grant yourself roles with NFT contracts you control. Simply go to the `Token Gating` section within your app dashboard.
+
+## Minting tokens
+
+While we have an Oracle deployed in the Slashauth demo app (for instance, check [our fallback demo app](https://q8xh-ki6lvfbuutg0236abcf.demo.slashauth.xyz/)) which allows for minting, these endpoints are not hooked up in the [demo backend](https://www.github.com/slashauth/demo-backend). Thus, hitting the mint buttons will result in 404 errors until they are hooked up when running `npm run dev`.
