@@ -24,6 +24,7 @@ import { toast } from 'react-hot-toast';
 import { classNames } from '../../util/classnames';
 import { AddFileModalContents } from '../../features/add-file/modal';
 import { BlobUploadStatus } from '../../model/blob';
+import { Link } from 'react-router-dom';
 
 export const AdminPage = () => {
   const modalContext = useContext(ModalContext);
@@ -50,7 +51,10 @@ export const AdminPage = () => {
       rolesRequired: string[];
       file: File;
     }) => {
-      const blobUpload = await blobUploads.create('pdf', input.file.size);
+      const blobUpload = await blobUploads.create(
+        'application/pdf',
+        input.file.size
+      );
       await fetch(blobUpload.signedUploadURL, {
         method: 'PUT',
         body: input.file,
@@ -183,7 +187,12 @@ export const AdminPage = () => {
         elements={Object.keys(files.data).map((fileID) => ({
           id: fileID,
           columns: [
-            <span className="text-sm">{files.data[fileID].name}</span>,
+            <Link
+              to={`/files/${fileID}`}
+              className="text-blue-500 hover:text-blue-600 focus:text-blue-700"
+            >
+              <span className="text-sm">{files.data[fileID].name}</span>
+            </Link>,
             <span className="text-sm">{files.data[fileID].rolesRequired}</span>,
             <span className="text-sm">
               {new Date(files.data[fileID].createdAt).toLocaleDateString()}

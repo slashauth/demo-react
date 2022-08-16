@@ -1,5 +1,5 @@
 export type FileConstructorProps = {
-  ID: string;
+  id: string;
   blobID: string;
   clientID: string;
   organizationID: string | null;
@@ -24,7 +24,7 @@ export class SlashauthFile {
   updatedAt: number;
 
   constructor({
-    ID,
+    id,
     blobID,
     clientID,
     organizationID,
@@ -35,7 +35,7 @@ export class SlashauthFile {
     createdAt,
     updatedAt,
   }: FileConstructorProps) {
-    this.id = ID;
+    this.id = id;
     this.blobID = blobID;
     this.clientID = clientID;
     this.organizationID = organizationID;

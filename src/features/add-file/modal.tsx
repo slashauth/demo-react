@@ -49,6 +49,9 @@ export const AddFileModalContents = ({ onSave }: Props) => {
     accept: { 'application/pdf': ['.pdf'] },
     disabled: selectedFiles?.length > 0,
     maxFiles: 1,
+    onDropRejected: () => {
+      toast.error('File must be a PDF <= 5 MB');
+    },
   });
 
   const validate = useCallback(() => {
@@ -114,9 +117,9 @@ export const AddFileModalContents = ({ onSave }: Props) => {
             <>
               <input {...getInputProps()} />
               {isDragActive ? (
-                <p>Drop the files here ...</p>
+                <p>Drop your PDF here...</p>
               ) : (
-                <p>Drop some files here, or click to select files</p>
+                <p>Drop a PDF here or click to select one</p>
               )}
             </>
           )}

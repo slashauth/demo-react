@@ -50,7 +50,7 @@ const AppProvider = ({ children }: Props) => {
   >({
     data: {
       [TEST_FILE_ID]: new SlashauthFile({
-        ID: TEST_FILE_ID,
+        id: TEST_FILE_ID,
         blobID: 'blob.12345',
         clientID: '',
         organizationID: null,

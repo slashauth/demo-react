@@ -1,5 +1,5 @@
 type BlobConstructorProps = {
-  ID: string;
+  id: string;
   signedUrl: string | null;
   status: BlobUploadStatus;
 };
@@ -15,8 +15,8 @@ export class BlobUpload {
   signedUploadURL: string | null;
   status: BlobUploadStatus;
 
-  constructor({ ID, signedUrl, status }: BlobConstructorProps) {
-    this.id = ID;
+  constructor({ id, signedUrl, status }: BlobConstructorProps) {
+    this.id = id;
     this.signedUploadURL = signedUrl;
     this.status = status;
   }

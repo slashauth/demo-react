@@ -377,7 +377,7 @@ export class API {
   }
 
   public async patchBlobUpload(
-    blobID: string,
+    id: string,
     input: {
       status: BlobUploadStatus;
     }
@@ -386,7 +386,7 @@ export class API {
     if (this._accessToken) {
       authHeader['Authorization'] = `Bearer ${this._accessToken}`;
     }
-    const response = await fetch(this._config.restDomain + `/blobs/${blobID}`, {
+    const response = await fetch(this._config.restDomain + `/blobs/${id}`, {
       headers: {
         ...this.defaultHeaders(),
         ...authHeader,
