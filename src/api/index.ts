@@ -1,12 +1,27 @@
 import { Config } from '../config';
 import { AppMetadata } from '../model/app-metadata';
+import { BlobUpload, BlobUploadStatus } from '../model/blob';
 import { SlashauthEvent } from '../model/event';
+import { SlashauthFile, FileConstructorProps } from '../model/file';
 import { User } from '../model/user';
 
 type MintResponse = {
   success: boolean;
   txHash: string;
   scanUrl: string;
+};
+
+export type CreateFileInput = {
+  blob_id: string;
+  name: string;
+  roles_required: string[];
+  description?: string;
+};
+
+export type PatchFileInput = {
+  name?: string;
+  rolesRequired?: string[];
+  description?: string;
 };
 
 export class API {
@@ -183,6 +198,209 @@ export class API {
     });
 
     return data;
+  }
+
+  // TODO: Add paging parameters.
+  public async listFiles(): Promise<SlashauthFile[]> {
+    const authHeader = {};
+    if (this._accessToken) {
+      authHeader['Authorization'] = `Bearer ${this._accessToken}`;
+    }
+    const response = await fetch(this._config.restDomain + '/files', {
+      headers: {
+        ...this.defaultHeaders(),
+        ...authHeader,
+      },
+      method: 'GET',
+    });
+
+    if (response.status !== 200) {
+      console.error('Failed to index files');
+      return [] as SlashauthFile[];
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data = (await response.json()).data.map(
+      (elem: Record<string, unknown>) => {
+        return new SlashauthFile(elem as FileConstructorProps);
+      }
+    );
+
+    return data;
+  }
+
+  public async getFile(fileID: string): Promise<SlashauthFile> {
+    const authHeader = {};
+    if (this._accessToken) {
+      authHeader['Authorization'] = `Bearer ${this._accessToken}`;
+    }
+    const response = await fetch(this._config.restDomain + '/files/' + fileID, {
+      headers: {
+        ...this.defaultHeaders(),
+        ...authHeader,
+      },
+      method: 'GET',
+    });
+
+    if (response.status !== 200) {
+      console.error('Failed to get file');
+      return null;
+    }
+
+    const elem = await response.json();
+    return new SlashauthFile(elem.data);
+  }
+
+  public async getPresignedURLForFile(fileID: string): Promise<string> {
+    const authHeader = {};
+    if (this._accessToken) {
+      authHeader['Authorization'] = `Bearer ${this._accessToken}`;
+    }
+    const response = await fetch(
+      this._config.restDomain + `/files/${fileID}/url`,
+      {
+        headers: {
+          ...this.defaultHeaders(),
+          ...authHeader,
+        },
+        method: 'GET',
+      }
+    );
+
+    if (response.status !== 200) {
+      console.error('Failed to get url for file');
+      return null;
+    }
+
+    const elem = await response.json();
+    return elem.data.url;
+  }
+
+  public async createFile(input: CreateFileInput): Promise<SlashauthFile> {
+    const authHeader = {};
+    if (this._accessToken) {
+      authHeader['Authorization'] = `Bearer ${this._accessToken}`;
+    }
+    const response = await fetch(this._config.restDomain + '/files', {
+      headers: {
+        ...this.defaultHeaders(),
+        ...authHeader,
+      },
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+
+    if (response.status > 299 || response.status < 200) {
+      console.error('Failed to patch file');
+    }
+
+    const elem = await response.json();
+    return new SlashauthFile(elem.data);
+  }
+
+  public async patchFile(
+    fileID: string,
+    { name, rolesRequired, description }: PatchFileInput
+  ): Promise<SlashauthFile> {
+    const authHeader = {};
+    if (this._accessToken) {
+      authHeader['Authorization'] = `Bearer ${this._accessToken}`;
+    }
+    const response = await fetch(this._config.restDomain + `/files/${fileID}`, {
+      headers: {
+        ...this.defaultHeaders(),
+        ...authHeader,
+      },
+      method: 'PATCH',
+      body: JSON.stringify({
+        name,
+        roles_required: rolesRequired,
+        description,
+      }),
+    });
+
+    if (response.status > 299 || response.status < 200) {
+      console.error('Failed to patch file');
+    }
+
+    const elem = await response.json();
+    return new SlashauthFile(elem.data);
+  }
+
+  public async deleteFile(fileID: string): Promise<SlashauthFile> {
+    const authHeader = {};
+    if (this._accessToken) {
+      authHeader['Authorization'] = `Bearer ${this._accessToken}`;
+    }
+    const response = await fetch(this._config.restDomain + `/files/${fileID}`, {
+      headers: {
+        ...this.defaultHeaders(),
+        ...authHeader,
+      },
+      method: 'DELETE',
+    });
+
+    if (response.status > 299 || response.status < 200) {
+      console.error('Failed to delete file');
+    }
+
+    const elem = await response.json();
+    return new SlashauthFile(elem.data);
+  }
+
+  public async createBlobUpload(
+    mimeType: string,
+    fileSize: number
+  ): Promise<BlobUpload> {
+    const authHeader = {};
+    if (this._accessToken) {
+      authHeader['Authorization'] = `Bearer ${this._accessToken}`;
+    }
+    const response = await fetch(this._config.restDomain + '/blobs', {
+      headers: {
+        ...this.defaultHeaders(),
+        ...authHeader,
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        mime_type: mimeType,
+        file_size: fileSize,
+      }),
+    });
+
+    if (response.status > 299 || response.status < 200) {
+      console.error('Failed to create blob upload');
+    }
+
+    const elem = await response.json();
+    return new BlobUpload(elem.data);
+  }
+
+  public async patchBlobUpload(
+    blobID: string,
+    input: {
+      status: BlobUploadStatus;
+    }
+  ): Promise<BlobUpload> {
+    const authHeader = {};
+    if (this._accessToken) {
+      authHeader['Authorization'] = `Bearer ${this._accessToken}`;
+    }
+    const response = await fetch(this._config.restDomain + `/blobs/${blobID}`, {
+      headers: {
+        ...this.defaultHeaders(),
+        ...authHeader,
+      },
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    });
+
+    if (response.status > 299 || response.status < 200) {
+      console.error('Failed to patch blob upload');
+    }
+
+    const elem = await response.json();
+    return new BlobUpload(elem);
   }
 
   private defaultHeaders(): Record<string, string> {

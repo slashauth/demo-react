@@ -1,11 +1,13 @@
 import { useSlashAuth } from '@slashauth/slashauth-react';
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { API } from '../api';
+import { API, CreateFileInput, PatchFileInput } from '../api';
 import { RoleNameAdmin, RoleNameMember } from '../constants';
 import { AppContext, ConfigContext } from '../context';
 import { AppMetadata } from '../model/app-metadata';
+import { BlobUpload, BlobUploadStatus } from '../model/blob';
 import { SlashauthEvent } from '../model/event';
 import { User } from '../model/user';
+import { SlashauthFile } from '../model/file';
 
 type Props = {
   children: React.ReactNode;
@@ -15,6 +17,8 @@ type FetchedData<T> = {
   data: T | null;
   loading: boolean;
 };
+
+export const TEST_FILE_ID = 'file.testpdf';
 
 const AppProvider = ({ children }: Props) => {
   const [appMetadata, setAppMetadata] = useState<FetchedData<AppMetadata>>({
@@ -37,6 +41,33 @@ const AppProvider = ({ children }: Props) => {
   });
 
   const [me, setMe] = useState<FetchedData<User>>({
+    data: undefined,
+    loading: false,
+  });
+
+  const [files, setFiles] = useState<
+    FetchedData<Record<string, SlashauthFile>>
+  >({
+    data: {
+      [TEST_FILE_ID]: new SlashauthFile({
+        ID: TEST_FILE_ID,
+        blobID: 'blob.12345',
+        clientID: '',
+        organizationID: null,
+        wallet: '',
+        name: 'Dataroom example',
+        description: '',
+        rolesRequired: [RoleNameMember],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }),
+    },
+    loading: false,
+  });
+
+  const [blobUploads, setBlobUploads] = useState<
+    FetchedData<Record<string, BlobUpload>>
+  >({
     data: undefined,
     loading: false,
   });
@@ -275,6 +306,277 @@ const AppProvider = ({ children }: Props) => {
     });
   }, [config, events, getAccessTokenSilently, isAuthenticated]);
 
+  const listFiles = useCallback(async () => {
+    if (!isAuthenticated) {
+      return null;
+    }
+    setFiles({
+      ...files,
+      loading: true,
+    });
+
+    return getAccessTokenSilently().then((token) => {
+      const api = new API(config, token);
+      return api
+        .listFiles()
+        .then((incomingFiles) => {
+          const fileMap = incomingFiles.reduce((acc, file) => {
+            acc[file.id] = file;
+            return acc;
+          }, files.data || {});
+          setFiles({
+            data: fileMap,
+            loading: false,
+          });
+          return incomingFiles;
+        })
+        .catch((err) => {
+          console.error('Error listing files: ', err);
+          setFiles({
+            ...files,
+            loading: false,
+          });
+          return null;
+        });
+    });
+  }, [config, files, getAccessTokenSilently, isAuthenticated]);
+
+  const getSignedFileURL = useCallback(
+    async (fileID: string) => {
+      if (!isAuthenticated) {
+        return null;
+      }
+
+      return getAccessTokenSilently().then((token) => {
+        const api = new API(config, token);
+        return api.getPresignedURLForFile(fileID).catch((err) => {
+          console.error('Error getting presigned URL for file: ', err);
+
+          return null;
+        });
+      });
+    },
+    [config, getAccessTokenSilently, isAuthenticated]
+  );
+
+  const getFile = useCallback(
+    async (fileID: string) => {
+      if (!isAuthenticated) {
+        return null;
+      }
+      setFiles({
+        ...files,
+        loading: true,
+      });
+
+      return getAccessTokenSilently().then((token) => {
+        const api = new API(config, token);
+        return api
+          .getFile(fileID)
+          .then((file) => {
+            const fileMap = files.data || {};
+            fileMap[fileID] = file;
+            setFiles({
+              data: fileMap,
+              loading: false,
+            });
+            return files;
+          })
+          .catch((err) => {
+            console.error('Error getting file: ', err);
+            setFiles({
+              ...files,
+              loading: false,
+            });
+            return null;
+          });
+      });
+    },
+    [config, files, getAccessTokenSilently, isAuthenticated]
+  );
+
+  const createFile = useCallback(
+    async (input: CreateFileInput) => {
+      if (!isAuthenticated) {
+        return null;
+      }
+      setFiles({
+        ...files,
+        loading: true,
+      });
+
+      return getAccessTokenSilently().then((token) => {
+        const api = new API(config, token);
+        return api
+          .createFile(input)
+          .then((file) => {
+            const fileMap = files.data || {};
+            fileMap[file.id] = file;
+            setFiles({
+              data: fileMap,
+              loading: false,
+            });
+            return files;
+          })
+          .catch((err) => {
+            console.error('Error creating file: ', err);
+            setFiles({
+              ...files,
+              loading: false,
+            });
+            return null;
+          });
+      });
+    },
+    [config, files, getAccessTokenSilently, isAuthenticated]
+  );
+
+  const patchFile = useCallback(
+    async (id: string, input: PatchFileInput) => {
+      if (!isAuthenticated) {
+        return null;
+      }
+      setFiles({
+        ...files,
+        loading: true,
+      });
+
+      return getAccessTokenSilently().then((token) => {
+        const api = new API(config, token);
+        return api
+          .patchFile(id, input)
+          .then((file) => {
+            const fileMap = files.data || {};
+            fileMap[file.id] = file;
+            setFiles({
+              data: fileMap,
+              loading: false,
+            });
+            return file;
+          })
+          .catch((err) => {
+            console.error('Error patching file: ', err);
+            setFiles({
+              ...files,
+              loading: false,
+            });
+            return null;
+          });
+      });
+    },
+    [config, files, getAccessTokenSilently, isAuthenticated]
+  );
+
+  const deleteFile = useCallback(
+    async (id: string) => {
+      if (!isAuthenticated) {
+        return null;
+      }
+      setFiles({
+        ...files,
+        loading: true,
+      });
+
+      return getAccessTokenSilently().then((token) => {
+        const api = new API(config, token);
+        return api
+          .deleteFile(id)
+          .then((file) => {
+            const fileMap = files.data || {};
+            if (fileMap[id]) {
+              fileMap[id] = undefined;
+            }
+            setFiles({
+              data: fileMap,
+              loading: false,
+            });
+            return file;
+          })
+          .catch((err) => {
+            console.error('Error deleting file: ', err);
+            setFiles({
+              ...files,
+              loading: false,
+            });
+            return null;
+          });
+      });
+    },
+    [config, files, getAccessTokenSilently, isAuthenticated]
+  );
+
+  const createBlobUpload = useCallback(
+    async (mimeType: string, fileSize: number) => {
+      if (!isAuthenticated) {
+        return null;
+      }
+      setBlobUploads({
+        ...blobUploads,
+        loading: true,
+      });
+
+      return getAccessTokenSilently().then((token) => {
+        const api = new API(config, token);
+        return api
+          .createBlobUpload(mimeType, fileSize)
+          .then((upload) => {
+            const uploadMap = blobUploads.data || {};
+            uploadMap[upload.id] = upload;
+            setBlobUploads({
+              data: uploadMap,
+              loading: false,
+            });
+            return upload;
+          })
+          .catch((err) => {
+            console.error('Error creating blob upload: ', err);
+            setBlobUploads({
+              ...blobUploads,
+              loading: false,
+            });
+            return null;
+          });
+      });
+    },
+    [blobUploads, config, getAccessTokenSilently, isAuthenticated]
+  );
+
+  const patchBlobUpload = useCallback(
+    async (id: string, status: BlobUploadStatus) => {
+      if (!isAuthenticated) {
+        return null;
+      }
+      setBlobUploads({
+        ...blobUploads,
+        loading: true,
+      });
+
+      return getAccessTokenSilently().then((token) => {
+        const api = new API(config, token);
+        return api
+          .patchBlobUpload(id, { status })
+          .then((upload) => {
+            const uploadMap = blobUploads.data || {};
+            uploadMap[upload.id] = upload;
+            setBlobUploads({
+              data: uploadMap,
+              loading: false,
+            });
+            return upload;
+          })
+          .catch((err) => {
+            console.error('Error creating blob upload: ', err);
+            setBlobUploads({
+              ...blobUploads,
+              loading: false,
+            });
+            return null;
+          });
+      });
+    },
+    [blobUploads, config, getAccessTokenSilently, isAuthenticated]
+  );
+
   if (
     roles &&
     roles[RoleNameAdmin] &&
@@ -285,6 +587,7 @@ const AppProvider = ({ children }: Props) => {
     if (roles[RoleNameAdmin].data && isAuthenticated) {
       fetchEvents();
       fetchUsers();
+      listFiles();
     }
     setLastRoleDataAdmin(roles[RoleNameAdmin].data);
   }
@@ -336,6 +639,20 @@ const AppProvider = ({ children }: Props) => {
           ...me,
           fetch: fetchMe,
           patch: patchMe,
+        },
+        files: {
+          ...files,
+          list: listFiles,
+          get: getFile,
+          getPresignedURL: getSignedFileURL,
+          create: createFile,
+          patch: patchFile,
+          delete: deleteFile,
+        },
+        blobUploads: {
+          ...blobUploads,
+          create: createBlobUpload,
+          patch: patchBlobUpload,
         },
       }}
     >
