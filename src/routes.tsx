@@ -8,7 +8,7 @@ import { ContactPage } from './pages/contact';
 import { AdminPage } from './pages/admin';
 import { AppContext } from './context';
 import { BeatLoader } from './common/components/spinners/beat-loader';
-import { AccountPage } from './pages/account';
+import { DataRoomPage } from './pages/data-room';
 
 export const SlashAuthRoutes = () => {
   const appContext = useContext(AppContext);
@@ -45,7 +45,7 @@ export const SlashAuthRoutes = () => {
           <div className="sm:mr-0">
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/account" element={<AccountPage />} />
+              <Route path="/files/*" element={<DataRoomPage />} />
               <Route path="/events" element={<EventsPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/admin" element={<AdminPage />} />

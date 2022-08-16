@@ -5,6 +5,7 @@ import {
 } from '@heroicons/react/outline';
 import { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { RoleNameAdmin, RoleNameMember } from '../constants';
 import { NavigationContext } from '../context';
 
 export enum LeftBarID {
@@ -22,6 +23,7 @@ export type SidebarItem = {
   name: string;
   pathname: string;
   alternatePathnames?: string[];
+  roleRequired?: string;
   icon: React.ElementType;
 };
 
@@ -34,26 +36,30 @@ const items: SidebarItem[] = [
   },
   {
     id: LeftBarID.Account,
-    name: 'Account',
-    pathname: '/account',
+    name: 'Data Room',
+    pathname: '/files',
+    roleRequired: RoleNameMember,
     icon: UserIcon,
   },
   {
     id: LeftBarID.Events,
     name: 'Events',
     pathname: '/events',
+    roleRequired: RoleNameMember,
     icon: CalendarIcon,
   },
   {
     id: LeftBarID.Contact,
     name: 'Contact',
     pathname: '/contact',
+    roleRequired: RoleNameMember,
     icon: PaperAirplaneIcon,
   },
   {
     id: LeftBarID.Admin,
     name: 'Admin',
     pathname: '/admin',
+    roleRequired: RoleNameAdmin,
     icon: UserIcon,
   },
 ];

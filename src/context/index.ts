@@ -1,10 +1,13 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { createContext } from 'react';
+import { CreateFileInput, PatchFileInput } from '../api';
 import { Config, emptyConfig } from '../config';
 import { AppMetadata } from '../model/app-metadata';
+import { BlobUpload, BlobUploadStatus } from '../model/blob';
 import { SlashauthEvent } from '../model/event';
 import { User } from '../model/user';
 import { NavigationState } from '../providers/navigation-provider';
+import { SlashauthFile } from '../model/file';
 
 export type ModalActionType = string;
 
@@ -16,6 +19,7 @@ export type UnlistenFn = () => void;
 
 export type ModalType = string;
 export const ModalTypeAddEvent: ModalType = 'addEvent';
+export const ModalTypeAddFile: ModalType = 'addFile';
 
 export type ModalContextType = {
   contents: React.ReactNode;
@@ -63,6 +67,22 @@ export type AppContextType = {
     fetch: () => Promise<User | null>;
     patch: (nickname: string) => Promise<User | null>;
   };
+  files: {
+    data: Record<string, SlashauthFile> | null;
+    loading: boolean;
+    list: () => Promise<SlashauthFile[] | null>;
+    get: (fileID: string) => Promise<SlashauthFile | null>;
+    getPresignedURL: (fileID: string) => Promise<string | null>;
+    create: (file: CreateFileInput) => Promise<SlashauthFile | null>;
+    patch: (id: string, input: PatchFileInput) => Promise<SlashauthFile>;
+    delete: (id: string) => Promise<SlashauthFile>;
+  };
+  blobUploads: {
+    data: Record<string, BlobUpload> | null;
+    loading: boolean;
+    create: (mimeType: string, fileSize: number) => Promise<BlobUpload | null>;
+    patch: (id: string, status: BlobUploadStatus) => Promise<BlobUpload>;
+  };
 };
 
 export const emptyAppContext = {
@@ -92,6 +112,22 @@ export const emptyAppContext = {
     loading: false,
     fetch: async () => null,
     patch: async (nickname: string) => null,
+  },
+  files: {
+    data: undefined,
+    loading: false,
+    list: async () => null,
+    get: async (id: string) => null,
+    getPresignedURL: async (id: string) => null,
+    create: async (file: CreateFileInput) => null,
+    patch: async (id: string, input: PatchFileInput) => null,
+    delete: async (id: string) => null,
+  },
+  blobUploads: {
+    data: undefined,
+    loading: false,
+    create: async () => null,
+    patch: async (id: string, status: BlobUploadStatus) => null,
   },
 };
 

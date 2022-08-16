@@ -6,8 +6,13 @@ import { LoggedOut } from '../../common/components/LoggedOut';
 import { NotAuthorized } from '../../common/components/NotAuthorized';
 import { BeatLoader } from '../../common/components/spinners/beat-loader';
 import ContentLayout from '../../common/layout/content';
-import { RoleNameAdmin } from '../../constants';
-import { AppContext, ModalContext, ModalTypeAddEvent } from '../../context';
+import { RoleNameAdmin, RoleNameMember } from '../../constants';
+import {
+  AppContext,
+  ModalContext,
+  ModalTypeAddEvent,
+  ModalTypeAddFile,
+} from '../../context';
 import { AddEventModalContents } from '../../features/add-event/modal';
 import { EventElem } from '../../features/events/event';
 import TopBar from '../../features/top-bar';
@@ -17,10 +22,13 @@ import { StripedTable } from '../../common/components/table/striped';
 import { shortenAddress } from '../../util/address';
 import { toast } from 'react-hot-toast';
 import { classNames } from '../../util/classnames';
+import { AddFileModalContents } from '../../features/add-file/modal';
+import { BlobUploadStatus } from '../../model/blob';
+import { Link } from 'react-router-dom';
 
 export const AdminPage = () => {
   const modalContext = useContext(ModalContext);
-  const { events, roles, users } = useContext(AppContext);
+  const { events, roles, users, files, blobUploads } = useContext(AppContext);
 
   const { isAuthenticated } = useSlashAuth();
 
@@ -35,6 +43,47 @@ export const AdminPage = () => {
       // Fetch more
     }
   }, []);
+
+  const handleUpload = useCallback(
+    async (input: {
+      name: string;
+      description: string | null;
+      rolesRequired: string[];
+      file: File;
+    }) => {
+      const blobUpload = await blobUploads.create(
+        'application/pdf',
+        input.file.size
+      );
+      await fetch(blobUpload.signedUploadURL, {
+        method: 'PUT',
+        body: input.file,
+        headers: {
+          'Content-Type': 'application/pdf',
+        },
+      });
+
+      await blobUploads.patch(blobUpload.id, BlobUploadStatus.COMPLETED);
+
+      await files.create({
+        name: input.name,
+        description: input.description,
+        roles_required: input.rolesRequired?.length
+          ? input.rolesRequired
+          : [RoleNameMember],
+        blob_id: blobUpload.id,
+      });
+    },
+    [blobUploads, files]
+  );
+
+  const handleUploadFile = useCallback(() => {
+    modalContext.setContents(
+      ModalTypeAddFile,
+      <AddFileModalContents onSave={handleUpload} />,
+      true
+    );
+  }, [handleUpload, modalContext]);
 
   const handleAddEvent = useCallback(() => {
     modalContext.setContents(
@@ -127,6 +176,33 @@ export const AdminPage = () => {
     );
   }, [users.data, users.loading]);
 
+  const fileContents = useMemo(() => {
+    if (!files.data || files.loading) {
+      return <BeatLoader />;
+    }
+
+    return (
+      <StripedTable
+        columnNames={['Name', 'Roles Required', 'Created At']}
+        elements={Object.keys(files.data).map((fileID) => ({
+          id: fileID,
+          columns: [
+            <Link
+              to={`/files/${fileID}`}
+              className="text-blue-500 hover:text-blue-600 focus:text-blue-700"
+            >
+              <span className="text-sm">{files.data[fileID].name}</span>
+            </Link>,
+            <span className="text-sm">{files.data[fileID].rolesRequired}</span>,
+            <span className="text-sm">
+              {new Date(files.data[fileID].createdAt).toLocaleDateString()}
+            </span>,
+          ],
+        }))}
+      />
+    );
+  }, [files.data, files.loading]);
+
   const contents = useMemo(() => {
     if (!isAuthenticated) {
       return <LoggedOut roleNameRequired="Admin" />;
@@ -145,7 +221,7 @@ export const AdminPage = () => {
     }
 
     return (
-      <div className="mt-8 ">
+      <div className="mt-8 divide-y-4 divide-gray-400">
         <div className="flex flex-col justify-between w-full mb-8">
           <div className="text-[24px] font-semibold text-left">
             Track Your App Users
@@ -160,7 +236,22 @@ export const AdminPage = () => {
             </div>
           </div>
         </div>
-        <div className="flex flex-col justify-center w-full mt-12 text-center">
+        <div className="flex flex-col justify-between w-full pt-8 mt-8">
+          <div className="flex items-center justify-between w-full mb-4">
+            <div className="text-[24px] font-semibold text-left">
+              Manage files for your app
+            </div>
+            <PrimaryButton onClick={() => handleUploadFile()}>
+              Add a file
+            </PrimaryButton>
+          </div>
+          <div className="mt-4 overflow-hidden border border-gray-200 rounded-lg">
+            <div className="overflow-hidden overflow-y-auto text-left max-h-96">
+              {fileContents}
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col justify-center w-full pt-8 mt-12 text-center">
           <div className="flex items-center justify-between w-full mb-8">
             <div className="text-[24px] font-semibold">
               Edit Your Upcoming Events
@@ -175,8 +266,10 @@ export const AdminPage = () => {
     );
   }, [
     eventsContent,
+    fileContents,
     handleAddEvent,
     handleListScroll,
+    handleUploadFile,
     isAuthenticated,
     roles.data,
     userContents,

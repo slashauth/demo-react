@@ -25,7 +25,7 @@ export const EventElem = ({ event, idx }: Props) => {
         </div>
         {event.link && (
           <a href={event.link} target="_blank" rel="noreferrer">
-            <WhiteButton onClick={() => console.log('foo')}>
+            <WhiteButton onClick={() => console.log('clicked')}>
               Details{' '}
             </WhiteButton>
           </a>

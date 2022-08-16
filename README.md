@@ -30,7 +30,7 @@ The following pages are gated by `Demo_Member`:
 
 - pages/events
 - pages/contact
-- pages/account
+- pages/data-room
 
 The following pages are gated by `Demo_Admin`:
 

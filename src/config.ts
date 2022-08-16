@@ -7,7 +7,6 @@ const appIDRegex = /^([^\\.]+)\.demo\.slashauth\.xyz$/;
 const FALLBACK_APP_ID = 'Q8XH-kI6lvFBUutG';
 
 const extractClientID = () => {
-  console.log(process.env);
   if (process.env.REACT_APP_APP_ID && process.env.REACT_APP_APP_ID.length > 0) {
     return process.env.REACT_APP_APP_ID;
   }
