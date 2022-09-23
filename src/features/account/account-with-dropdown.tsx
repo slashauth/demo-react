@@ -5,6 +5,7 @@ import React, { Fragment } from 'react';
 import { LoggedInAccountHeader } from './LoggedInAccountHeader';
 
 type Props = {
+  isAuthenticated: boolean;
   connectedAddress: string | null;
   ensAddress?: string | null;
   isLoggedIn: boolean;
@@ -12,8 +13,14 @@ type Props = {
 };
 
 export const AccountWithDropdown = React.memo(
-  ({ connectedAddress, ensAddress, isLoggedIn, logout }: Props) => {
-    return connectedAddress ? (
+  ({
+    isAuthenticated,
+    connectedAddress,
+    ensAddress,
+    isLoggedIn,
+    logout,
+  }: Props) => {
+    return isAuthenticated ? (
       <Menu as="div" className="relative flex-shrink-0 ml-5">
         <Menu.Button className="flex focus:outline-none">
           <LoggedInAccountHeader />

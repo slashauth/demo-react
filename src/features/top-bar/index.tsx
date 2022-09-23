@@ -20,11 +20,11 @@ function TopBar() {
   const { appMetadata } = useContext(AppContext);
 
   const topActionButton = useMemo(() => {
-    if (!connectedWallet) {
+    if (!isAuthenticated) {
       return <AccountButton />;
     }
     return null;
-  }, [connectedWallet]);
+  }, [isAuthenticated]);
 
   return (
     <Popover className="z-10 bg-white border-b border-gray-100 dark:bg-black dark:border-gray-800">
@@ -44,6 +44,7 @@ function TopBar() {
               <div className="flex items-center">
                 {topActionButton}
                 <AccountWithDropdown
+                  isAuthenticated={isAuthenticated}
                   connectedAddress={connectedWallet}
                   isLoggedIn={isAuthenticated}
                   logout={async () => {
