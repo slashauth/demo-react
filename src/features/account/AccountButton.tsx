@@ -72,7 +72,7 @@ export const AccountButton = ({ additionalClassNames }: Props) => {
           additionalClassNames={additionalClassNames}
           onClick={activate}
         >
-          {isLoading ? 'Loading...' : 'Login With Wallet'}
+          {isLoading ? 'Loading...' : 'Login'}
         </PrimaryButton>
       );
     }
