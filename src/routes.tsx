@@ -56,7 +56,7 @@ export const SlashAuthRoutes = () => {
               <h1 className="mb-4 text-3xl font-bold text-center">
                 Creating your SlashAuth demo environment
               </h1>
-              <BeatLoader />;
+              <BeatLoader />
             </div>
           </ContentLayout>
         </div>
