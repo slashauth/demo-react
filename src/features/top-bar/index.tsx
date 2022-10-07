@@ -1,30 +1,19 @@
-import { Fragment, useContext, useMemo } from 'react';
+import { Fragment, useContext } from 'react';
 import { MenuIcon, XIcon } from '@heroicons/react/outline';
 import { AppContext, NavigationContext } from '../../context';
 import ContentLayout from '../../common/layout/content';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { TopBarNavigation } from './navigation';
 import { Popover, Transition } from '@headlessui/react';
 import { ReactComponent as SlashauthIcon } from '../../common/icons/slashauth-dark-icon.svg';
-import { useSlashAuth } from '@slashauth/slashauth-react';
-import { AccountButton } from '../account/AccountButton';
+import { SlashAuthUserDropdownComponent } from '@slashauth/slashauth-react';
 import { classNames } from '../../util/classnames';
-import { AccountWithDropdown } from '../account/account-with-dropdown';
 import { H1 } from '../../common/styles/typography';
 
 function TopBar() {
-  const { isAuthenticated, connectedWallet, logout } = useSlashAuth();
   const navigation = useContext(NavigationContext);
-  const navigate = useNavigate();
 
   const { appMetadata } = useContext(AppContext);
-
-  const topActionButton = useMemo(() => {
-    if (!isAuthenticated) {
-      return <AccountButton />;
-    }
-    return null;
-  }, [isAuthenticated]);
 
   return (
     <Popover className="z-10 bg-white border-b border-gray-100 dark:bg-black dark:border-gray-800">
@@ -42,19 +31,9 @@ function TopBar() {
               </div>
 
               <div className="flex items-center">
-                {topActionButton}
-                <AccountWithDropdown
-                  isAuthenticated={isAuthenticated}
-                  connectedAddress={connectedWallet}
-                  isLoggedIn={isAuthenticated}
-                  logout={async () => {
-                    try {
-                      await logout();
-                    } finally {
-                      navigate('/');
-                    }
-                  }}
-                />
+                <div className="z-50">
+                  <SlashAuthUserDropdownComponent />
+                </div>
                 <Popover.Button className="inline-flex items-center justify-center p-2 text-gray-400 bg-transparent rounded-md twotab:hidden hover:text-gray-700 hover:bg-white hover:bg-opacity-10 focus:outline-none focus:ring-2 focus:ring-white">
                   <span className="sr-only">Open main menu</span>
                   {open ? (
