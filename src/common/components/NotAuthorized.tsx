@@ -12,7 +12,7 @@ type Props = {
 
 export const NotAuthorized = ({ roleNameRequired }: Props) => {
   const { roles } = useContext(AppContext);
-  const { connectedWallet, getAccessTokenSilently } = useSlashAuth();
+  const { connectedWallet, getTokens } = useSlashAuth();
   const config = useContext(ConfigContext);
 
   const [minting, setMinting] = useState(false);
@@ -24,7 +24,7 @@ export const NotAuthorized = ({ roleNameRequired }: Props) => {
     }
     setMinting(true);
     try {
-      const token = await getAccessTokenSilently();
+      const token = await getTokens();
       if (token) {
         const resp = await new API(config, token).mintToken(roleNameRequired);
         if (resp.success) {
@@ -51,14 +51,7 @@ export const NotAuthorized = ({ roleNameRequired }: Props) => {
     } finally {
       setMinting(false);
     }
-  }, [
-    config,
-    connectedWallet,
-    getAccessTokenSilently,
-    minting,
-    roleNameRequired,
-    roles,
-  ]);
+  }, [config, connectedWallet, getTokens, minting, roleNameRequired, roles]);
 
   if (minting) {
     return (

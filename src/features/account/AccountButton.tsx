@@ -11,11 +11,11 @@ export const AccountButton = ({ additionalClassNames }: Props) => {
   const {
     isTwoStep,
     isLoginReady,
-    loginNoRedirectNoPopup,
     isLoading,
     isLoggingIn,
     connect,
     connectedWallet,
+    openSignIn,
   } = useSlashAuth();
 
   const contents = useMemo(() => {
@@ -32,7 +32,7 @@ export const AccountButton = ({ additionalClassNames }: Props) => {
     }
 
     const activate = async () => {
-      await loginNoRedirectNoPopup();
+      await openSignIn();
     };
 
     if (isTwoStep) {
@@ -49,7 +49,7 @@ export const AccountButton = ({ additionalClassNames }: Props) => {
         return (
           <PrimaryButton
             additionalClassNames={additionalClassNames}
-            onClick={() => loginNoRedirectNoPopup()}
+            onClick={() => openSignIn()}
           >
             Login
           </PrimaryButton>
@@ -83,7 +83,7 @@ export const AccountButton = ({ additionalClassNames }: Props) => {
     isLoading,
     isLoginReady,
     isTwoStep,
-    loginNoRedirectNoPopup,
+    openSignIn,
     isLoggingIn,
   ]);
 

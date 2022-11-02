@@ -72,7 +72,7 @@ const AppProvider = ({ children }: Props) => {
     loading: false,
   });
 
-  const { getAccessTokenSilently, isAuthenticated, hasRole } = useSlashAuth();
+  const { getTokens, isAuthenticated, hasRole } = useSlashAuth();
   const config = useContext(ConfigContext);
 
   const [lastRoleDataAdmin, setLastRoleDataAdmin] = useState(false);
@@ -148,7 +148,7 @@ const AppProvider = ({ children }: Props) => {
         }),
       0
     );
-    return getAccessTokenSilently().then((token) => {
+    return getTokens().then((token) => {
       const api = new API(config, token);
       return api
         .getMe()
@@ -168,11 +168,11 @@ const AppProvider = ({ children }: Props) => {
           return null;
         });
     });
-  }, [config, getAccessTokenSilently, me]);
+  }, [config, getTokens, me]);
 
   const patchMe = useCallback(
     async (nickname: string): Promise<User | null> => {
-      return getAccessTokenSilently().then((token) => {
+      return getTokens().then((token) => {
         const api = new API(config, token);
         return api
           .patchMe(nickname)
@@ -189,12 +189,12 @@ const AppProvider = ({ children }: Props) => {
           });
       });
     },
-    [config, getAccessTokenSilently]
+    [config, getTokens]
   );
 
   const addEvent = useCallback(
     async (ev: SlashauthEvent): Promise<SlashauthEvent | null> => {
-      return getAccessTokenSilently().then((token) => {
+      return getTokens().then((token) => {
         const api = new API(config, token);
         return api
           .addEvent(ev)
@@ -207,7 +207,7 @@ const AppProvider = ({ children }: Props) => {
           });
       });
     },
-    [config, getAccessTokenSilently]
+    [config, getTokens]
   );
 
   const fetchAppMetadata =
@@ -220,7 +220,7 @@ const AppProvider = ({ children }: Props) => {
           }),
         0
       );
-      return getAccessTokenSilently().then((token) => {
+      return getTokens().then((token) => {
         const api = new API(config, token);
         return api
           .getAppMetadata()
@@ -240,7 +240,7 @@ const AppProvider = ({ children }: Props) => {
             return null;
           });
       });
-    }, [appMetadata, config, getAccessTokenSilently]);
+    }, [appMetadata, config, getTokens]);
 
   const fetchUsers = useCallback(async (): Promise<User[] | null> => {
     if (!isAuthenticated) {
@@ -251,7 +251,7 @@ const AppProvider = ({ children }: Props) => {
       loading: true,
     }));
 
-    return getAccessTokenSilently().then((token) => {
+    return getTokens().then((token) => {
       const api = new API(config, token);
       return api
         .getUsers()
@@ -271,7 +271,7 @@ const AppProvider = ({ children }: Props) => {
           return null;
         });
     });
-  }, [config, getAccessTokenSilently, isAuthenticated]);
+  }, [config, getTokens, isAuthenticated]);
 
   const fetchEvents = useCallback(async (): Promise<
     SlashauthEvent[] | null
@@ -284,7 +284,7 @@ const AppProvider = ({ children }: Props) => {
       loading: true,
     });
 
-    return getAccessTokenSilently().then((token) => {
+    return getTokens().then((token) => {
       const api = new API(config, token);
       return api
         .getEvents()
@@ -304,7 +304,7 @@ const AppProvider = ({ children }: Props) => {
           return null;
         });
     });
-  }, [config, events, getAccessTokenSilently, isAuthenticated]);
+  }, [config, events, getTokens, isAuthenticated]);
 
   const listFiles = useCallback(async () => {
     if (!isAuthenticated) {
@@ -315,7 +315,7 @@ const AppProvider = ({ children }: Props) => {
       loading: true,
     });
 
-    return getAccessTokenSilently().then((token) => {
+    return getTokens().then((token) => {
       const api = new API(config, token);
       return api
         .listFiles()
@@ -339,7 +339,7 @@ const AppProvider = ({ children }: Props) => {
           return null;
         });
     });
-  }, [config, files, getAccessTokenSilently, isAuthenticated]);
+  }, [config, files, getTokens, isAuthenticated]);
 
   const getSignedFileURL = useCallback(
     async (fileID: string) => {
@@ -347,7 +347,7 @@ const AppProvider = ({ children }: Props) => {
         return null;
       }
 
-      return getAccessTokenSilently().then((token) => {
+      return getTokens().then((token) => {
         const api = new API(config, token);
         return api.getPresignedURLForFile(fileID).catch((err) => {
           console.error('Error getting presigned URL for file: ', err);
@@ -356,7 +356,7 @@ const AppProvider = ({ children }: Props) => {
         });
       });
     },
-    [config, getAccessTokenSilently, isAuthenticated]
+    [config, getTokens, isAuthenticated]
   );
 
   const getFile = useCallback(
@@ -369,7 +369,7 @@ const AppProvider = ({ children }: Props) => {
         loading: true,
       });
 
-      return getAccessTokenSilently().then((token) => {
+      return getTokens().then((token) => {
         const api = new API(config, token);
         return api
           .getFile(fileID)
@@ -392,7 +392,7 @@ const AppProvider = ({ children }: Props) => {
           });
       });
     },
-    [config, files, getAccessTokenSilently, isAuthenticated]
+    [config, files, getTokens, isAuthenticated]
   );
 
   const createFile = useCallback(
@@ -405,7 +405,7 @@ const AppProvider = ({ children }: Props) => {
         loading: true,
       });
 
-      return getAccessTokenSilently().then((token) => {
+      return getTokens().then((token) => {
         const api = new API(config, token);
         return api
           .createFile(input)
@@ -428,7 +428,7 @@ const AppProvider = ({ children }: Props) => {
           });
       });
     },
-    [config, files, getAccessTokenSilently, isAuthenticated]
+    [config, files, getTokens, isAuthenticated]
   );
 
   const patchFile = useCallback(
@@ -441,7 +441,7 @@ const AppProvider = ({ children }: Props) => {
         loading: true,
       });
 
-      return getAccessTokenSilently().then((token) => {
+      return getTokens().then((token) => {
         const api = new API(config, token);
         return api
           .patchFile(id, input)
@@ -464,7 +464,7 @@ const AppProvider = ({ children }: Props) => {
           });
       });
     },
-    [config, files, getAccessTokenSilently, isAuthenticated]
+    [config, files, getTokens, isAuthenticated]
   );
 
   const deleteFile = useCallback(
@@ -477,7 +477,7 @@ const AppProvider = ({ children }: Props) => {
         loading: true,
       });
 
-      return getAccessTokenSilently().then((token) => {
+      return getTokens().then((token) => {
         const api = new API(config, token);
         return api
           .deleteFile(id)
@@ -502,7 +502,7 @@ const AppProvider = ({ children }: Props) => {
           });
       });
     },
-    [config, files, getAccessTokenSilently, isAuthenticated]
+    [config, files, getTokens, isAuthenticated]
   );
 
   const createBlobUpload = useCallback(
@@ -515,7 +515,7 @@ const AppProvider = ({ children }: Props) => {
         loading: true,
       });
 
-      return getAccessTokenSilently().then((token) => {
+      return getTokens().then((token) => {
         const api = new API(config, token);
         return api
           .createBlobUpload(mimeType, fileSize)
@@ -538,7 +538,7 @@ const AppProvider = ({ children }: Props) => {
           });
       });
     },
-    [blobUploads, config, getAccessTokenSilently, isAuthenticated]
+    [blobUploads, config, getTokens, isAuthenticated]
   );
 
   const patchBlobUpload = useCallback(
@@ -551,7 +551,7 @@ const AppProvider = ({ children }: Props) => {
         loading: true,
       });
 
-      return getAccessTokenSilently().then((token) => {
+      return getTokens().then((token) => {
         const api = new API(config, token);
         return api
           .patchBlobUpload(id, { status })
@@ -574,7 +574,7 @@ const AppProvider = ({ children }: Props) => {
           });
       });
     },
-    [blobUploads, config, getAccessTokenSilently, isAuthenticated]
+    [blobUploads, config, getTokens, isAuthenticated]
   );
 
   if (
