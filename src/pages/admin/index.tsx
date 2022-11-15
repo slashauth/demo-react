@@ -205,7 +205,7 @@ export const AdminPage = () => {
 
   const contents = useMemo(() => {
     if (!isAuthenticated) {
-      return <LoggedOut roleNameRequired="Admin" />;
+      return <LoggedOut roleNameRequired={RoleNameAdmin} />;
     }
 
     if (

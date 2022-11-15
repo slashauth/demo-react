@@ -1,4 +1,4 @@
-import { Fragment, useContext, useEffect, useMemo, useState } from 'react';
+import { Fragment, useContext, useMemo, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { NavigationProvider } from './providers/navigation-provider';
 import { SlashAuthLoadedWrapper } from './common/components/slashauth-loader-wrapper';
@@ -13,13 +13,8 @@ import ContentLayout from './common/layout/content';
 import { Transition } from '@headlessui/react';
 
 export const SlashAuthRoutes = () => {
-  const [loading, setLoading] = useState(true);
   const appContext = useContext(AppContext);
   const [fetchingMetadata, setFetchingMetadata] = useState(false);
-
-  useEffect(() => {
-    setTimeout(() => setLoading(false), 3000);
-  }, []);
 
   if (
     appContext.appMetadata.data === undefined &&
@@ -40,8 +35,11 @@ export const SlashAuthRoutes = () => {
     return (
       <Transition
         as={Fragment}
-        show={loading || appContext.appMetadata.data === undefined}
-        leave="transition ease-in duration-500"
+        show={
+          appContext.appMetadata.loading ||
+          appContext.appMetadata.data === undefined
+        }
+        leave="transition ease-in duration-200"
         leaveFrom="transform opacity-100"
         leaveTo="transform opacity-0"
       >
@@ -53,16 +51,13 @@ export const SlashAuthRoutes = () => {
                 className="w-16 h-16 mb-12"
                 alt="slashauth-logo"
               />
-              <h1 className="mb-4 text-3xl font-bold text-center">
-                Creating your SlashAuth demo environment
-              </h1>
               <BeatLoader />
             </div>
           </ContentLayout>
         </div>
       </Transition>
     );
-  }, [appContext.appMetadata.data, loading]);
+  }, [appContext.appMetadata.data, appContext.appMetadata.loading]);
 
   if (appContext.appMetadata.data === null) {
     return (
