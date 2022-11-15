@@ -13,6 +13,7 @@ import ContentLayout from './common/layout/content';
 import { Transition } from '@headlessui/react';
 
 export const SlashAuthRoutes = () => {
+  const [loading, setLoading] = useState(true);
   const appContext = useContext(AppContext);
   const [fetchingMetadata, setFetchingMetadata] = useState(false);
 
@@ -24,6 +25,7 @@ export const SlashAuthRoutes = () => {
     setFetchingMetadata(true);
     appContext.appMetadata.fetch().finally(() => {
       setFetchingMetadata(false);
+      setLoading(false);
     });
   }
 
@@ -35,11 +37,8 @@ export const SlashAuthRoutes = () => {
     return (
       <Transition
         as={Fragment}
-        show={
-          appContext.appMetadata.loading ||
-          appContext.appMetadata.data === undefined
-        }
-        leave="transition ease-in duration-200"
+        show={loading || appContext.appMetadata.data === undefined}
+        leave="transition ease-in duration-500"
         leaveFrom="transform opacity-100"
         leaveTo="transform opacity-0"
       >
@@ -57,7 +56,7 @@ export const SlashAuthRoutes = () => {
         </div>
       </Transition>
     );
-  }, [appContext.appMetadata.data, appContext.appMetadata.loading]);
+  }, [appContext.appMetadata.data, loading]);
 
   if (appContext.appMetadata.data === null) {
     return (
