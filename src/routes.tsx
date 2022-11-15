@@ -1,4 +1,4 @@
-import { Fragment, useContext, useEffect, useMemo, useState } from 'react';
+import { Fragment, useContext, useMemo, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { NavigationProvider } from './providers/navigation-provider';
 import { SlashAuthLoadedWrapper } from './common/components/slashauth-loader-wrapper';
@@ -17,10 +17,6 @@ export const SlashAuthRoutes = () => {
   const appContext = useContext(AppContext);
   const [fetchingMetadata, setFetchingMetadata] = useState(false);
 
-  useEffect(() => {
-    setTimeout(() => setLoading(false), 3000);
-  }, []);
-
   if (
     appContext.appMetadata.data === undefined &&
     !appContext.appMetadata.loading &&
@@ -29,6 +25,7 @@ export const SlashAuthRoutes = () => {
     setFetchingMetadata(true);
     appContext.appMetadata.fetch().finally(() => {
       setFetchingMetadata(false);
+      setLoading(false);
     });
   }
 
@@ -53,9 +50,6 @@ export const SlashAuthRoutes = () => {
                 className="w-16 h-16 mb-12"
                 alt="slashauth-logo"
               />
-              <h1 className="mb-4 text-3xl font-bold text-center">
-                Creating your SlashAuth demo environment
-              </h1>
               <BeatLoader />
             </div>
           </ContentLayout>
