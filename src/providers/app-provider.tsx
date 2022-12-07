@@ -4,7 +4,6 @@ import { API, CreateFileInput, PatchFileInput } from '../api';
 import { RoleNameAdmin, RoleNameMember } from '../constants';
 import { AppContext, ConfigContext } from '../context';
 import { AppMetadata } from '../model/app-metadata';
-import { BlobUpload, BlobUploadStatus } from '../model/blob';
 import { SlashauthEvent } from '../model/event';
 import { User } from '../model/user';
 import { SlashauthFile } from '../model/file';
@@ -62,13 +61,6 @@ const AppProvider = ({ children }: Props) => {
         updatedAt: new Date().toISOString(),
       }),
     },
-    loading: false,
-  });
-
-  const [blobUploads, setBlobUploads] = useState<
-    FetchedData<Record<string, BlobUpload>>
-  >({
-    data: undefined,
     loading: false,
   });
 
@@ -505,78 +497,6 @@ const AppProvider = ({ children }: Props) => {
     [config, files, getTokens, isAuthenticated]
   );
 
-  const createBlobUpload = useCallback(
-    async (mimeType: string, fileSize: number) => {
-      if (!isAuthenticated) {
-        return null;
-      }
-      setBlobUploads({
-        ...blobUploads,
-        loading: true,
-      });
-
-      return getTokens().then((token) => {
-        const api = new API(config, token);
-        return api
-          .createBlobUpload(mimeType, fileSize)
-          .then((upload) => {
-            const uploadMap = blobUploads.data || {};
-            uploadMap[upload.id] = upload;
-            setBlobUploads({
-              data: uploadMap,
-              loading: false,
-            });
-            return upload;
-          })
-          .catch((err) => {
-            console.error('Error creating blob upload: ', err);
-            setBlobUploads({
-              ...blobUploads,
-              loading: false,
-            });
-            return null;
-          });
-      });
-    },
-    [blobUploads, config, getTokens, isAuthenticated]
-  );
-
-  const patchBlobUpload = useCallback(
-    async (id: string, status: BlobUploadStatus) => {
-      if (!isAuthenticated) {
-        return null;
-      }
-      setBlobUploads({
-        ...blobUploads,
-        loading: true,
-      });
-
-      return getTokens().then((token) => {
-        const api = new API(config, token);
-        return api
-          .patchBlobUpload(id, { status })
-          .then((upload) => {
-            const uploadMap = blobUploads.data || {};
-            uploadMap[upload.id] = upload;
-            setBlobUploads({
-              data: uploadMap,
-              loading: false,
-            });
-            return upload;
-          })
-          .catch((err) => {
-            console.error('Error creating blob upload: ', err);
-            setBlobUploads({
-              ...blobUploads,
-              loading: false,
-            });
-            return null;
-          });
-      });
-    },
-    [blobUploads, config, getTokens, isAuthenticated]
-  );
-
   if (
     roles &&
     roles[RoleNameAdmin] &&
@@ -648,11 +568,6 @@ const AppProvider = ({ children }: Props) => {
           create: createFile,
           patch: patchFile,
           delete: deleteFile,
-        },
-        blobUploads: {
-          ...blobUploads,
-          create: createBlobUpload,
-          patch: patchBlobUpload,
         },
       }}
     >
