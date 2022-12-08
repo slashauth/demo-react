@@ -3,7 +3,6 @@ import { createContext } from 'react';
 import { CreateFileInput, PatchFileInput } from '../api';
 import { Config, emptyConfig } from '../config';
 import { AppMetadata } from '../model/app-metadata';
-import { BlobUpload, BlobUploadStatus } from '../model/blob';
 import { SlashauthEvent } from '../model/event';
 import { User } from '../model/user';
 import { NavigationState } from '../providers/navigation-provider';
@@ -77,12 +76,6 @@ export type AppContextType = {
     patch: (id: string, input: PatchFileInput) => Promise<SlashauthFile>;
     delete: (id: string) => Promise<SlashauthFile>;
   };
-  blobUploads: {
-    data: Record<string, BlobUpload> | null;
-    loading: boolean;
-    create: (mimeType: string, fileSize: number) => Promise<BlobUpload | null>;
-    patch: (id: string, status: BlobUploadStatus) => Promise<BlobUpload>;
-  };
 };
 
 export const emptyAppContext = {
@@ -122,12 +115,6 @@ export const emptyAppContext = {
     create: async (file: CreateFileInput) => null,
     patch: async (id: string, input: PatchFileInput) => null,
     delete: async (id: string) => null,
-  },
-  blobUploads: {
-    data: undefined,
-    loading: false,
-    create: async () => null,
-    patch: async (id: string, status: BlobUploadStatus) => null,
   },
 };
 

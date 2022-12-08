@@ -23,12 +23,11 @@ import { shortenAddress } from '../../util/address';
 import { toast } from 'react-hot-toast';
 import { classNames } from '../../util/classnames';
 import { AddFileModalContents } from '../../features/add-file/modal';
-import { BlobUploadStatus } from '../../model/blob';
 import { Link } from 'react-router-dom';
 
 export const AdminPage = () => {
   const modalContext = useContext(ModalContext);
-  const { events, roles, users, files, blobUploads } = useContext(AppContext);
+  const { events, roles, users, files } = useContext(AppContext);
 
   const { isAuthenticated } = useSlashAuth();
 
@@ -51,30 +50,16 @@ export const AdminPage = () => {
       rolesRequired: string[];
       file: File;
     }) => {
-      const blobUpload = await blobUploads.create(
-        'application/pdf',
-        input.file.size
-      );
-      await fetch(blobUpload.signedUploadURL, {
-        method: 'PUT',
-        body: input.file,
-        headers: {
-          'Content-Type': 'application/pdf',
-        },
-      });
-
-      await blobUploads.patch(blobUpload.id, BlobUploadStatus.COMPLETED);
-
       await files.create({
         name: input.name,
         description: input.description,
         roles_required: input.rolesRequired?.length
           ? input.rolesRequired
           : [RoleNameMember],
-        blob_id: blobUpload.id,
+        file: input.file,
       });
     },
-    [blobUploads, files]
+    [files]
   );
 
   const handleUploadFile = useCallback(() => {
