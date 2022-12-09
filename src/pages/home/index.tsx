@@ -35,7 +35,7 @@ const Home = () => {
                   }
                 >
                   <div className="flex flex-row space-x-2 place-items-center">
-                    <GithubIcon className="w-auto h-6" />
+                    <GithubIcon className="w-auto h-6 text-black" />
                     <div className="content-center">Frontend</div>
                   </div>
                 </PrimaryButton>
