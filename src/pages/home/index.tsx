@@ -8,6 +8,7 @@ import {
   ShieldCheckIcon,
   SparklesIcon,
 } from '@heroicons/react/outline';
+import { ReactComponent as GithubIcon } from '../../common/icons/github-mark.svg';
 
 const Home = () => {
   return (
@@ -24,15 +25,29 @@ const Home = () => {
             <div className="flex flex-col items-start justify-center w-full h-full px-2 sm:w-2/3 sm:px-0 md: xl:w-2/5 text-banner">
               <h1 className="text-[36px] font-semibold">Welcome!</h1>
               <p className="text-[21px]">
-                Share public information on your homepage that is accessible to
-                all.
+                The frontend and backend code for this app is available on
+                Github.
               </p>
               <div className="flex flex-row mt-4 space-x-2">
-                <PrimaryButton onClick={() => console.log('clicked')}>
-                  Get Started
+                <PrimaryButton
+                  onClick={() =>
+                    window.open('https://github.com/slashauth/demo-react')
+                  }
+                >
+                  <div className="flex flex-row space-x-2 place-items-center">
+                    <GithubIcon className="w-auto h-6 text-black" />
+                    <div className="content-center">Frontend</div>
+                  </div>
                 </PrimaryButton>
-                <WhiteButton onClick={() => console.log('clicked')}>
-                  Contact Us
+                <WhiteButton
+                  onClick={() =>
+                    window.open('https://github.com/slashauth/demo-backend')
+                  }
+                >
+                  <div className="flex flex-row space-x-2 place-items-center">
+                    <GithubIcon className="w-auto h-6" />
+                    <div className="content-center">Backend</div>
+                  </div>
                 </WhiteButton>
               </div>
             </div>
