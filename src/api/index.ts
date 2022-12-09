@@ -102,7 +102,7 @@ export class API {
     if (this._accessToken) {
       authHeader['Authorization'] = `Bearer ${this._accessToken}`;
     }
-    const response = await fetch(this._config.restDomain + '/event', {
+    const response = await fetch(this._config.restDomain + '/events', {
       headers: {
         ...this.defaultHeaders(),
         ...authHeader,

@@ -224,7 +224,7 @@ export const DataRoomPage = () => {
       </div>
       <ContentLayout fullHeight additionalClassnames="mt-8">
         <main className="text-center text-primary">
-          <div className="px-4 mt-8">{filesContent}</div>
+          <div className="mt-8">{filesContent}</div>
         </main>
       </ContentLayout>
     </>
