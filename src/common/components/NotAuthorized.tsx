@@ -12,14 +12,14 @@ type Props = {
 
 export const NotAuthorized = ({ roleNameRequired }: Props) => {
   const { roles } = useContext(AppContext);
-  const { connectedWallet, getTokens } = useSlashAuth();
+  const { getTokens, account } = useSlashAuth();
   const config = useContext(ConfigContext);
 
   const [minting, setMinting] = useState(false);
   const [txResponse, setTxResponse] = useState<string>(null);
 
   const handleMintClick = useCallback(async () => {
-    if (!connectedWallet || minting) {
+    if (!account?.wallet?.default || minting) {
       return;
     }
     setMinting(true);
@@ -51,7 +51,14 @@ export const NotAuthorized = ({ roleNameRequired }: Props) => {
     } finally {
       setMinting(false);
     }
-  }, [config, connectedWallet, getTokens, minting, roleNameRequired, roles]);
+  }, [
+    account?.wallet?.default,
+    config,
+    getTokens,
+    minting,
+    roleNameRequired,
+    roles,
+  ]);
 
   if (minting) {
     return (
