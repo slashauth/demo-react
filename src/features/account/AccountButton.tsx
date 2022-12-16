@@ -8,15 +8,7 @@ type Props = {
 };
 
 export const AccountButton = ({ additionalClassNames }: Props) => {
-  const {
-    isTwoStep,
-    isLoginReady,
-    isLoading,
-    isLoggingIn,
-    connect,
-    connectedWallet,
-    openSignIn,
-  } = useSlashAuth();
+  const { isLoading, isLoggingIn, openSignIn } = useSlashAuth();
 
   const contents = useMemo(() => {
     if (isLoading || isLoggingIn) {
@@ -35,57 +27,15 @@ export const AccountButton = ({ additionalClassNames }: Props) => {
       await openSignIn();
     };
 
-    if (isTwoStep) {
-      if (!connectedWallet) {
-        return (
-          <PrimaryButton
-            additionalClassNames={additionalClassNames}
-            onClick={() => connect(false)}
-          >
-            Connect Wallet
-          </PrimaryButton>
-        );
-      } else if (isLoginReady) {
-        return (
-          <PrimaryButton
-            additionalClassNames={additionalClassNames}
-            onClick={() => openSignIn()}
-          >
-            Login
-          </PrimaryButton>
-        );
-      } else {
-        return (
-          <PrimaryButton
-            additionalClassNames={additionalClassNames}
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            onClick={() => {}}
-            disabled
-          >
-            Loading...
-          </PrimaryButton>
-        );
-      }
-    } else {
-      return (
-        <PrimaryButton
-          additionalClassNames={additionalClassNames}
-          onClick={activate}
-        >
-          {isLoading ? 'Loading...' : 'Login'}
-        </PrimaryButton>
-      );
-    }
-  }, [
-    additionalClassNames,
-    connect,
-    connectedWallet,
-    isLoading,
-    isLoginReady,
-    isTwoStep,
-    openSignIn,
-    isLoggingIn,
-  ]);
+    return (
+      <PrimaryButton
+        additionalClassNames={additionalClassNames}
+        onClick={activate}
+      >
+        {isLoading ? 'Loading...' : 'Login'}
+      </PrimaryButton>
+    );
+  }, [additionalClassNames, isLoading, openSignIn, isLoggingIn]);
 
   return <div className="flex items-center justify-start">{contents}</div>;
 };
