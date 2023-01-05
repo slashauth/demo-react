@@ -1,6 +1,6 @@
-import { CalendarIcon, ClipboardCopyIcon } from '@heroicons/react/outline';
+import { CalendarIcon } from '@heroicons/react/outline';
 import { useSlashAuth } from '@slashauth/slashauth-react';
-import { useCallback, useContext, useMemo, useRef } from 'react';
+import { useCallback, useContext, useMemo } from 'react';
 import { PrimaryButton } from '../../common/components/Buttons';
 import { LoggedOut } from '../../common/components/LoggedOut';
 import { NotAuthorized } from '../../common/components/NotAuthorized';
@@ -19,29 +19,15 @@ import TopBar from '../../features/top-bar';
 import { SlashauthEvent } from '../../model/event';
 import adminGradient from '../../common/gradients/admin-gradient.png';
 import { StripedTable } from '../../common/components/table/striped';
-import { shortenAddress } from '../../util/address';
-import { toast } from 'react-hot-toast';
 import { classNames } from '../../util/classnames';
 import { AddFileModalContents } from '../../features/add-file/modal';
 import { Link } from 'react-router-dom';
 
 export const AdminPage = () => {
   const modalContext = useContext(ModalContext);
-  const { events, roles, users, files } = useContext(AppContext);
+  const { events, roles, files } = useContext(AppContext);
 
   const { isAuthenticated } = useSlashAuth();
-
-  const listDivRef = useRef<HTMLDivElement>(null);
-
-  const handleListScroll = useCallback(() => {
-    if (
-      // If has more
-      listDivRef.current &&
-      listDivRef.current.scrollHeight > 0
-    ) {
-      // Fetch more
-    }
-  }, []);
 
   const handleUpload = useCallback(
     async (input: {
@@ -118,49 +104,6 @@ export const AdminPage = () => {
     );
   }, [events]);
 
-  const userContents = useMemo(() => {
-    if (!users.data || users.loading) {
-      return <BeatLoader />;
-    }
-
-    return (
-      <StripedTable
-        columnNames={['Address', 'Nickname', 'Roles', 'Last Accessed']}
-        elements={users.data.map((user) => ({
-          id: user.address,
-          columns: [
-            <div className="flex flex-row items-center space-x-2">
-              <div className="text-sm">{shortenAddress(user.address)}</div>
-              <ClipboardCopyIcon
-                className="w-4 h-4 cursor-pointer"
-                onMouseDown={(e) => e.stopPropagation()}
-                onMouseUp={(e) => e.stopPropagation()}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigator.clipboard.writeText(user.address);
-                  toast.success('Copied to clipboard', {
-                    duration: 1000,
-                    id: 'copyable-text-div',
-                  });
-                }}
-              />
-            </div>,
-            <span
-              className={classNames(
-                'text-sm',
-                !user.nickname && 'text-gray-300 italic'
-              )}
-            >
-              {user.nickname || 'No nickname'}
-            </span>,
-            <span>{(user.roles || []).sort().join(', ')}</span>,
-            <span>{new Date(user.dateTime).toLocaleDateString()}</span>,
-          ],
-        }))}
-      />
-    );
-  }, [users.data, users.loading]);
-
   const fileContents = useMemo(() => {
     if (!files.data || files.loading) {
       return <BeatLoader />;
@@ -207,20 +150,6 @@ export const AdminPage = () => {
 
     return (
       <div className="mt-8 divide-y-4 divide-gray-400">
-        <div className="flex flex-col justify-between w-full mb-8">
-          <div className="text-[24px] font-semibold text-left">
-            Track Your App Users
-          </div>
-          <div className="mt-4 overflow-hidden border border-gray-200 rounded-lg">
-            <div
-              ref={listDivRef}
-              className="overflow-hidden overflow-y-auto text-left max-h-96"
-              onScroll={handleListScroll}
-            >
-              {userContents}
-            </div>
-          </div>
-        </div>
         <div className="flex flex-col justify-between w-full pt-8 mt-8">
           <div className="flex items-center justify-between w-full mb-4">
             <div className="text-[24px] font-semibold text-left">
@@ -253,11 +182,9 @@ export const AdminPage = () => {
     eventsContent,
     fileContents,
     handleAddEvent,
-    handleListScroll,
     handleUploadFile,
     isAuthenticated,
     roles.data,
-    userContents,
   ]);
 
   return (

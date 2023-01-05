@@ -34,11 +34,6 @@ const AppProvider = ({ children }: Props) => {
     [roleName: string]: FetchedData<boolean>;
   }>({});
 
-  const [users, setUsers] = useState<FetchedData<User[]>>({
-    data: undefined,
-    loading: false,
-  });
-
   const [me, setMe] = useState<FetchedData<User>>({
     data: undefined,
     loading: false,
@@ -233,37 +228,6 @@ const AppProvider = ({ children }: Props) => {
           });
       });
     }, [appMetadata, config, getTokens]);
-
-  const fetchUsers = useCallback(async (): Promise<User[] | null> => {
-    if (!isAuthenticated) {
-      return null;
-    }
-    setUsers((existing) => ({
-      ...existing,
-      loading: true,
-    }));
-
-    return getTokens().then((token) => {
-      const api = new API(config, token);
-      return api
-        .getUsers()
-        .then((users) => {
-          setUsers({
-            data: users,
-            loading: false,
-          });
-          return users;
-        })
-        .catch((err) => {
-          console.error('Error fetching users: ', err);
-          setUsers({
-            data: null,
-            loading: false,
-          });
-          return null;
-        });
-    });
-  }, [config, getTokens, isAuthenticated]);
 
   const fetchEvents = useCallback(async (): Promise<
     SlashauthEvent[] | null
@@ -506,7 +470,6 @@ const AppProvider = ({ children }: Props) => {
   ) {
     if (roles[RoleNameAdmin].data && isAuthenticated) {
       fetchEvents();
-      fetchUsers();
       listFiles();
     }
     setLastRoleDataAdmin(roles[RoleNameAdmin].data);
@@ -550,10 +513,6 @@ const AppProvider = ({ children }: Props) => {
           },
           fetch: fetchRoleData,
           fetchRoles,
-        },
-        users: {
-          ...users,
-          fetch: fetchUsers,
         },
         me: {
           ...me,

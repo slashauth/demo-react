@@ -55,11 +55,6 @@ export type AppContextType = {
     fetch: (roleName: string) => Promise<boolean>;
     fetchRoles: () => Promise<void>;
   };
-  users: {
-    data: User[] | null;
-    loading: boolean;
-    fetch: () => Promise<User[] | null>;
-  };
   me: {
     data: User | null;
     loading: boolean;
